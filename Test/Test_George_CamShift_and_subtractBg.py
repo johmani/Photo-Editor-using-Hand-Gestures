@@ -7,6 +7,8 @@ from pynput.mouse import Button, Controller
 
 def nothing(x):
     pass
+
+
 def histogram(firstFrame, r, h, c, w):
     # roi = firstFrame[r:r+h, c:c+w]
     hsv_roi = cv.cvtColor(firstFrame, cv.COLOR_BGR2HSV)
@@ -18,6 +20,8 @@ def histogram(firstFrame, r, h, c, w):
     cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
     return [hist]
+
+
 def setMask():
     cv.namedWindow("Settings")
     cv.resizeWindow("Settings", 640, 250)
@@ -39,7 +43,9 @@ def setMask():
     while (1):
         _, frame = cap.read()
         frame = cv.flip(frame, 1)
-        hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+        cv.rectangle(frame, (430, 150), (630, 400), (0, 255, 0), 1)
+        roi = frame[150:400, 431:630]
+        hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
 
         hl = cv.getTrackbarPos("H Low", "Settings")
         hu = cv.getTrackbarPos("H Up", "Settings")
@@ -58,7 +64,7 @@ def setMask():
         mask = cv.dilate(mask, ker, iterations=1)
         mask = cv.morphologyEx(mask, cv.MORPH_OPEN, ker)
         mask = cv.medianBlur(mask, 15)
-        res = cv.bitwise_and(frame, frame, mask=mask)
+        res = cv.bitwise_and(roi, roi, mask=mask)
 
         cv.imshow("Original", frame)
         cv.imshow("Filter", res)
@@ -121,7 +127,7 @@ def findFingers(res, max_con):
 
                 if angle <= 90 and d > 30:
                     num_def += 1
-                    cv.circle(res, far, 3, (0, 255, 255), -1)
+                    cv.circle(res, far, 3, (255, 0, 0), -1)
 
                 cv.line(res, start, end, (0, 0, 255), 2)
 
@@ -173,38 +179,46 @@ def findFarPoint(res, cx, cy, defects, max_con):
         farthest_point = 0
 
         return farthest_point
+
+
 def recognizeGestures(frame, num_def, count, farthest_point):
     try:
         if num_def == 1:
-            cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 3, cv.LINE_AA)
-            return 2
+            cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+            return 2;
 
         elif num_def == 2:
-            cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 3, cv.LINE_AA)
-            return 3
+            cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+            return 3;
+
         elif num_def == 3:
-            cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 3, cv.LINE_AA)
-            return 4
+            cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+            return 4;
+
 
         elif num_def == 4:
-            cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 3, cv.LINE_AA)
-            return 5
+            cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+            return 5;
+
 
         else:
-            cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 3, cv.LINE_AA)
-            return 1
+            cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+            return 1;
+
 
     except:
         print("You moved the hand too fast or take it out of range of vision of the camera")
 
-
 cap = cv.VideoCapture('http://192.168.43.1:8080/video')
+# cap = cv.VideoCapture(0)
 
 _, firstFrame = cap.read()
 firstFrame = cv.flip(firstFrame, 1)
+cv.rectangle(firstFrame, (430, 150), (630, 400), (0, 255, 0), 1)
+roi2 = firstFrame[150:400, 431:630]
 r, h, c, w = 0, 240, 0, 640
 track_window = (c, r, w, h)
-[hist] = histogram(firstFrame, r, h, c, w)
+[hist] = histogram(roi2, r, h, c, w)
 term_crit = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1)
 
 bgCaptured = False
@@ -216,34 +230,33 @@ cv.setTrackbarPos("Value", "Value", 20)
 mouse = Controller()
 count = 0
 ex = 0
+
 trigger = False
 
-
-while (True):
+while (1):
     ret, frame = cap.read()
     frame = cv.flip(frame, 1)
 
-    cv.rectangle(frame, (430, 150), (630, 400), (0, 255, 0), 1)
-    roi3 = frame[150:400, 431:630]
+    roi3 = frame[150:400 , 431:630]
 
-    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+    hsv = cv.cvtColor(roi3, cv.COLOR_BGR2HSV)
     dst = cv.calcBackProject([hsv], [0], hist, [0, 180], 1)
     ret, track_window = cv.CamShift(dst, track_window, term_crit)
     pts = cv.boxPoints(ret)
     pts = np.int0(pts)
 
     if bgCaptured is True:
-        mask = subtractBg(frame)
+        mask = subtractBg(roi3)
 
         vThresh = cv.getTrackbarPos("Value", "Value")
 
         ker = np.ones((5, 5), np.uint8)
 
-        img = np.zeros(frame.shape, np.uint8)
+        img = np.zeros(roi3.shape, np.uint8)
         chanCount = mask.shape[2]
         ignoreColor = (255,) * chanCount
         cv.fillConvexPoly(img, pts, ignoreColor)
-        res = cv.bitwise_and(mask, mask)
+        res = cv.bitwise_and(mask, img)
 
         resMask = cv.dilate(res, ker, iterations=1)
         resMask = cv.morphologyEx(resMask, cv.MORPH_OPEN, ker)
@@ -264,13 +277,13 @@ while (True):
         farthest_point = findFarPoint(res, cx, cy, defects, max_con)
 
         if trigger is True:
-           recognizeGestures(frame, num_def, count, farthest_point)
+            recognizeGestures(roi3, num_def, count, farthest_point)
 
-        # cv.imshow("Live", frame)
+        cv.imshow("Live", frame)
         cv.imshow("Result", res)
         cv.imshow("Threshold", rThresh)
         cv.imshow("Mask", mask)
-        cv.imshow("test", frame)
+        cv.imshow("flags", roi3)
 
     k = cv.waitKey(1)
     if k & 0xFF == 27:
