@@ -1,14 +1,19 @@
-from tkinter import Frame, Button, LEFT
+from tkinter import Frame, Button, LEFT,Scale,Label,Entry
 from tkinter import filedialog
 from ImageEditor.forDelete.filterFrame import FilterFrame
 from ImageEditor.forDelete.adjustFrame import AdjustFrame
 import cv2
+import tkinter as tk
+
+from Test.TransFormOperations import TransForm
 
 
 class EditBar(Frame):
 
     def __init__(self, master=None):
         Frame.__init__(self, master=master)
+
+        self.prevPos = 0
 
         self.new_button = Button(self, text="New",height = 4,width = 8,background="white")
         self.save_button = Button(self, text="Save",height = 4,width = 8,background="white")
@@ -21,6 +26,13 @@ class EditBar(Frame):
         self.blue_Button = Button(self,height = 4,width = 8,background="blue")
         self.green_Button = Button(self,height = 4,width = 8,background="green")
 
+        self.transfrom_label = Label(self, text="Transfrom")
+
+        self.position = Entry(self, width=8)
+        self.rotation_Button = Button(self, text="Rotate",width=8, background="white")
+        self.scale    = Entry(self, width=8)
+        self.apply_Button = Button(self, text="apply",width=8, background="white")
+
         self.new_button.bind("<ButtonRelease>", self.new_button_released)
         self.save_button.bind("<ButtonRelease>", self.save_button_released)
         self.save_as_button.bind("<ButtonRelease>", self.save_as_button_released)
@@ -31,6 +43,10 @@ class EditBar(Frame):
         self.red_Button.bind("<ButtonRelease>", self.red_Button_released)
         self.blue_Button.bind("<ButtonRelease>", self.blue_Button_released)
         self.green_Button.bind("<ButtonRelease>", self.green_Button_released)
+
+        self.rotation_Button.bind("<ButtonRelease>", self.rotation_Button_released)
+        self.apply_Button.bind("<ButtonRelease>", self.apply_Button_released)
+
 
         self.new_button.pack(side=LEFT)
         self.save_button.pack(side=LEFT)
@@ -43,7 +59,13 @@ class EditBar(Frame):
         self.blue_Button.pack(side=LEFT)
         self.green_Button.pack(side=LEFT)
 
+        self.transfrom_label.pack(side=tk.TOP)
+        self.rotation_Button.pack(side=tk.TOP)
 
+
+
+
+        self.apply_Button.pack(side=tk.TOP)
 
 
     def new_button_released(self, event):
@@ -118,3 +140,21 @@ class EditBar(Frame):
         self.master.drawColor = "blue"
     def green_Button_released(self, event):
         self.master.drawColor = "green"
+
+
+
+
+    def apply_Button_released(self,val):
+
+        # self.master.processed_image = TransForm.Translate(self.master.processed_image,self.position.get(),0)
+        self.master.processed_image = TransForm.Rotate(self.master.processed_image)
+        self.master.processed_image = TransForm.Scale(self.master.processed_image,int(self.scale.get()) ,int(self.scale.get()))
+
+        self.master.image_viewer.show_image()
+
+
+    def rotation_Button_released(self,val):
+        self.master.processed_image = TransForm.Rotate(self.master.processed_image)
+        self.master.image_viewer.show_image()
+
+
