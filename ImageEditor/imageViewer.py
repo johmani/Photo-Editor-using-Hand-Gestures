@@ -11,10 +11,6 @@ class ImageViewer(Frame):
         self.shown_image = None
         self.x = 0
         self.y = 0
-        self.crop_start_x = 0
-        self.crop_start_y = 0
-        self.crop_end_x = 0
-        self.crop_end_y = 0
         self.draw_ids = list()
         self.rectangle_id = 0
         self.ratio = 0
@@ -59,12 +55,7 @@ class ImageViewer(Frame):
 
         self.master.is_draw_state = True
 
-    def activate_crop(self):
-        self.canvas.bind("<ButtonPress>", self.start_crop)
-        self.canvas.bind("<B1-Motion>", self.crop)
-        self.canvas.bind("<ButtonRelease>", self.end_crop)
 
-        self.master.is_crop_state = True
 
     def deactivate_draw(self):
         self.canvas.unbind("<ButtonPress>")
@@ -72,12 +63,6 @@ class ImageViewer(Frame):
 
         self.master.is_draw_state = False
 
-    def deactivate_crop(self):
-        self.canvas.unbind("<ButtonPress>")
-        self.canvas.unbind("<B1-Motion>")
-        self.canvas.unbind("<ButtonRelease>")
-
-        self.master.is_crop_state = False
 
     def start_draw(self, event):
         self.x = event.x
@@ -94,49 +79,6 @@ class ImageViewer(Frame):
 
         self.x = event.x
         self.y = event.y
-
-    def start_crop(self, event):
-        self.crop_start_x = event.x
-        self.crop_start_y = event.y
-
-    def crop(self, event):
-        if self.rectangle_id:
-            self.canvas.delete(self.rectangle_id)
-
-        self.crop_end_x = event.x
-        self.crop_end_y = event.y
-
-        self.rectangle_id = self.canvas.create_rectangle(self.crop_start_x, self.crop_start_y,
-                                                         self.crop_end_x, self.crop_end_y, width=1)
-
-    def end_crop(self, event):
-        if self.crop_start_x <= self.crop_end_x and self.crop_start_y <= self.crop_end_y:
-            start_x = int(self.crop_start_x * self.ratio)
-            start_y = int(self.crop_start_y * self.ratio)
-            end_x = int(self.crop_end_x * self.ratio)
-            end_y = int(self.crop_end_y * self.ratio)
-        elif self.crop_start_x > self.crop_end_x and self.crop_start_y <= self.crop_end_y:
-            start_x = int(self.crop_end_x * self.ratio)
-            start_y = int(self.crop_start_y * self.ratio)
-            end_x = int(self.crop_start_x * self.ratio)
-            end_y = int(self.crop_end_y * self.ratio)
-        elif self.crop_start_x <= self.crop_end_x and self.crop_start_y > self.crop_end_y:
-            start_x = int(self.crop_start_x * self.ratio)
-            start_y = int(self.crop_end_y * self.ratio)
-            end_x = int(self.crop_end_x * self.ratio)
-            end_y = int(self.crop_start_y * self.ratio)
-        else:
-            start_x = int(self.crop_end_x * self.ratio)
-            start_y = int(self.crop_end_y * self.ratio)
-            end_x = int(self.crop_start_x * self.ratio)
-            end_y = int(self.crop_start_y * self.ratio)
-
-        x = slice(start_x, end_x, 1)
-        y = slice(start_y, end_y, 1)
-
-        self.master.processed_image = self.master.processed_image[y, x]
-
-        self.show_image()
 
     def clear_canvas(self):
         self.canvas.delete("all")
