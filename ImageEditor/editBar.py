@@ -1,11 +1,9 @@
 from tkinter import Frame, Button, LEFT,Scale,Label,Entry
 from tkinter import filedialog
-from ImageEditor.forDelete.filterFrame import FilterFrame
-from ImageEditor.forDelete.adjustFrame import AdjustFrame
+
 import cv2
 import tkinter as tk
-
-from Test.TransFormOperations import TransForm
+from ImageEditor.Functionality import Functionality
 
 
 class EditBar(Frame):
@@ -26,12 +24,10 @@ class EditBar(Frame):
         self.blue_Button = Button(self,height = 4,width = 8,background="blue")
         self.green_Button = Button(self,height = 4,width = 8,background="green")
 
-        self.transfrom_label = Label(self, text="Transfrom")
-
-        self.position = Entry(self, width=8)
-        self.rotation_Button = Button(self, text="Rotate",width=8, background="white")
-        self.scale    = Entry(self, width=8)
-        self.apply_Button = Button(self, text="apply",width=8, background="white")
+        self.position_Button = Button(self, text="Translate",height = 4,width=8, background="white")
+        self.rotation_Button = Button(self, text="Rotate",height = 4,width=8, background="white")
+        self.scale_up_Button = Button(self, text="Scale up",height = 2,width=8, background="white")
+        self.scale_down_Button = Button(self, text="Scale down", height = 2,width=8, background="white")
 
         self.new_button.bind("<ButtonRelease>", self.new_button_released)
         self.save_button.bind("<ButtonRelease>", self.save_button_released)
@@ -44,9 +40,10 @@ class EditBar(Frame):
         self.blue_Button.bind("<ButtonRelease>", self.blue_Button_released)
         self.green_Button.bind("<ButtonRelease>", self.green_Button_released)
 
-        self.rotation_Button.bind("<ButtonRelease>", self.rotation_Button_released)
-        self.apply_Button.bind("<ButtonRelease>", self.apply_Button_released)
-
+        self.position_Button.bind("<ButtonRelease>", self.Translate_Button_released)
+        self.rotation_Button.bind("<ButtonRelease>", self.Rotate_Button_released)
+        self.scale_up_Button.bind("<ButtonRelease>", self.Scale_Up_Button_released)
+        self.scale_down_Button.bind("<ButtonRelease>", self.Scale_Down_Button_released)
 
         self.new_button.pack(side=LEFT)
         self.save_button.pack(side=LEFT)
@@ -58,16 +55,12 @@ class EditBar(Frame):
         self.red_Button.pack(side=LEFT)
         self.blue_Button.pack(side=LEFT)
         self.green_Button.pack(side=LEFT)
+        self.position_Button.pack(side=tk.LEFT)
+        self.rotation_Button.pack(side=tk.LEFT)
+        self.scale_up_Button.pack(side=tk.TOP)
+        self.scale_down_Button.pack(side=tk.TOP)
 
-        self.transfrom_label.pack(side=tk.TOP)
-        self.rotation_Button.pack(side=tk.TOP)
-
-
-
-
-        self.apply_Button.pack(side=tk.TOP)
-
-
+    # Standard stuff
     def new_button_released(self, event):
         if self.winfo_containing(event.x_root, event.y_root) == self.new_button:
             if self.master.is_draw_state:
@@ -83,7 +76,6 @@ class EditBar(Frame):
                 self.master.processed_image = image.copy()
                 self.master.image_viewer.show_image()
                 self.master.is_image_selected = True
-
     def save_button_released(self, event):
         if self.winfo_containing(event.x_root, event.y_root) == self.save_button:
             if self.master.is_image_selected:
@@ -93,7 +85,6 @@ class EditBar(Frame):
                 save_image = self.master.processed_image
                 image_filename = self.master.filename
                 cv2.imwrite(image_filename, save_image)
-
     def save_as_button_released(self, event):
         if self.winfo_containing(event.x_root, event.y_root) == self.save_as_button:
             if self.master.is_image_selected:
@@ -108,7 +99,6 @@ class EditBar(Frame):
                 cv2.imwrite(filename, save_image)
 
                 self.master.filename = filename
-
     def draw_button_released(self, event):
         if self.winfo_containing(event.x_root, event.y_root) == self.draw_button:
             if self.master.is_image_selected:
@@ -118,9 +108,6 @@ class EditBar(Frame):
                 else:
                     self.master.image_viewer.activate_draw()
                     self.draw_button.configure(bg="gray")
-
-
-
     def clear_button_released(self, event):
         if self.winfo_containing(event.x_root, event.y_root) == self.clear_button:
             if self.master.is_image_selected:
@@ -130,8 +117,7 @@ class EditBar(Frame):
                 self.master.processed_image = self.master.original_image.copy()
                 self.master.image_viewer.show_image()
 
-
-
+    # Color stuff
     def black_Button_released(self, event):
         self.master.drawColor = "black"
     def red_Button_released(self, event):
@@ -141,20 +127,28 @@ class EditBar(Frame):
     def green_Button_released(self, event):
         self.master.drawColor = "green"
 
+    # TransForm stuff
+    def Translate_Button_released(self, event):
+        if self.winfo_containing(event.x_root, event.y_root) == self.position_Button:
+            if self.master.is_image_selected:
+                self.master.processed_image = Functionality.Translate(self.master.processed_image,100,0)
+                self.master.image_viewer.show_image()
+    def Rotate_Button_released(self, event):
+        if self.winfo_containing(event.x_root, event.y_root) == self.rotation_Button:
+            if self.master.is_image_selected:
+                self.master.processed_image = Functionality.Rotate(self.master.processed_image)
+                self.master.image_viewer.show_image()
+    def Scale_Up_Button_released(self, event):
+        if self.winfo_containing(event.x_root, event.y_root) == self.scale_up_Button:
+            if self.master.is_image_selected:
+                self.master.processed_image = Functionality.Scale(self.master.processed_image, 1.2, 1.2)
+                self.master.image_viewer.show_image()
+    def Scale_Down_Button_released(self, event):
+        if self.winfo_containing(event.x_root, event.y_root) == self.scale_down_Button:
+            if self.master.is_image_selected:
+                self.master.processed_image = Functionality.Scale(self.master.processed_image,0.8,0.8)
+                self.master.image_viewer.show_image()
 
 
-
-    def apply_Button_released(self,val):
-
-        # self.master.processed_image = TransForm.Translate(self.master.processed_image,self.position.get(),0)
-        self.master.processed_image = TransForm.Rotate(self.master.processed_image)
-        self.master.processed_image = TransForm.Scale(self.master.processed_image,int(self.scale.get()) ,int(self.scale.get()))
-
-        self.master.image_viewer.show_image()
-
-
-    def rotation_Button_released(self,val):
-        self.master.processed_image = TransForm.Rotate(self.master.processed_image)
-        self.master.image_viewer.show_image()
 
 

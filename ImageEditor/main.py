@@ -14,6 +14,7 @@ class Main(tk.Tk):
         self.is_image_selected = False
         self.is_draw_state = False
         self.drawColor = "red"
+        self.thickness = 2
 
         self.title("Image Editor")
 

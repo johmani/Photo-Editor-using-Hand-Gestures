@@ -52,35 +52,33 @@ class ImageViewer(Frame):
     def activate_draw(self):
         self.canvas.bind("<ButtonPress>", self.start_draw)
         self.canvas.bind("<B1-Motion>", self.draw)
-
         self.master.is_draw_state = True
-
-
 
     def deactivate_draw(self):
         self.canvas.unbind("<ButtonPress>")
         self.canvas.unbind("<B1-Motion>")
-
         self.master.is_draw_state = False
-
 
     def start_draw(self, event):
         self.x = event.x
         self.y = event.y
 
     def draw(self, event):
-        self.draw_ids.append(self.canvas.create_line(self.x, self.y, event.x, event.y, width=2,fill=self.master.drawColor, capstyle=ROUND, smooth=True))
 
-        cv2.line(self.master.processed_image, (int(self.x * self.ratio), int(self.y * self.ratio)),
-                 (int(event.x * self.ratio), int(event.y * self.ratio)),
-                 (0, 255, 255), thickness=int(self.ratio * 2),
-                 lineType=8)
+        c = (0, 0, 0)
+        self.draw_ids.append(self.canvas.create_line(self.x, self.y, event.x, event.y, width=self.master.thickness,fill=self.master.drawColor, capstyle=ROUND, smooth=True))
+
+        if self.master.drawColor == "black": c = (0,0,0)
+        if self.master.drawColor == "red": c =   (0, 0, 255)
+        if self.master.drawColor == "blue": c =  (255, 0, 0)
+        if self.master.drawColor == "green": c = (0, 255, 0)
+
+        cv2.line(self.master.processed_image, (int(self.x * self.ratio), int(self.y * self.ratio)),(int(event.x * self.ratio), int(event.y * self.ratio)),c, thickness=self.master.thickness,lineType=8)
 
         self.x = event.x
         self.y = event.y
 
     def clear_canvas(self):
         self.canvas.delete("all")
-
     def clear_draw(self):
         self.canvas.delete(self.draw_ids)
