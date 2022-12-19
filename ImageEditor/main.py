@@ -13,6 +13,7 @@ class Main(tk.Tk):
         self.processed_image = None
         self.is_image_selected = False
         self.is_draw_state = False
+        self.drawColor = "red"
 
         self.title("Image Editor")
 

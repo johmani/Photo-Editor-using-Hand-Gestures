@@ -69,12 +69,11 @@ class ImageViewer(Frame):
         self.y = event.y
 
     def draw(self, event):
-        self.draw_ids.append(self.canvas.create_line(self.x, self.y, event.x, event.y, width=2,
-                                                     fill="red", capstyle=ROUND, smooth=True))
+        self.draw_ids.append(self.canvas.create_line(self.x, self.y, event.x, event.y, width=2,fill=self.master.drawColor, capstyle=ROUND, smooth=True))
 
         cv2.line(self.master.processed_image, (int(self.x * self.ratio), int(self.y * self.ratio)),
                  (int(event.x * self.ratio), int(event.y * self.ratio)),
-                 (0, 0, 255), thickness=int(self.ratio * 2),
+                 (0, 255, 255), thickness=int(self.ratio * 2),
                  lineType=8)
 
         self.x = event.x
