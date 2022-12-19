@@ -29,6 +29,8 @@ class EditBar(Frame):
         self.scale_up_Button = Button(self, text="Scale up",height = 2,width=8, background="white")
         self.scale_down_Button = Button(self, text="Scale down", height = 2,width=8, background="white")
 
+        self.thickness_Slider = Scale(self,from_=1,to=10,orient=tk.HORIZONTAL,command=self.thickness_Slider_com)
+
         self.new_button.bind("<ButtonRelease>", self.new_button_released)
         self.save_button.bind("<ButtonRelease>", self.save_button_released)
         self.save_as_button.bind("<ButtonRelease>", self.save_as_button_released)
@@ -45,6 +47,8 @@ class EditBar(Frame):
         self.scale_up_Button.bind("<ButtonRelease>", self.Scale_Up_Button_released)
         self.scale_down_Button.bind("<ButtonRelease>", self.Scale_Down_Button_released)
 
+
+
         self.new_button.pack(side=LEFT)
         self.save_button.pack(side=LEFT)
         self.save_as_button.pack(side=LEFT)
@@ -59,6 +63,8 @@ class EditBar(Frame):
         self.rotation_Button.pack(side=tk.LEFT)
         self.scale_up_Button.pack(side=tk.TOP)
         self.scale_down_Button.pack(side=tk.TOP)
+
+        self.thickness_Slider.pack()
 
     # Standard stuff
     def new_button_released(self, event):
@@ -150,5 +156,6 @@ class EditBar(Frame):
                 self.master.image_viewer.show_image()
 
 
-
+    def thickness_Slider_com(self,event):
+        self.master.thickness = self.thickness_Slider.get()
 
