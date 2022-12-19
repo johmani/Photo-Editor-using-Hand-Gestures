@@ -1,14 +1,11 @@
 import cv2 as cv
 import numpy as np
-import os
 import math
-from pynput.mouse import Button, Controller
-
+from pynput.mouse import Controller
+# from HarrCascades import DeletFace
 
 def nothing(x):
     pass
-
-
 def histogram(firstFrame, r, h, c, w):
     # roi = firstFrame[r:r+h, c:c+w]
     hsv_roi = cv.cvtColor(firstFrame, cv.COLOR_BGR2HSV)
@@ -18,7 +15,6 @@ def histogram(firstFrame, r, h, c, w):
     mask = cv.inRange(hsv_roi, low, up)
     hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])
     cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
-
     return [hist]
 
 
@@ -42,7 +38,9 @@ def setMask():
 
     while (1):
         _, frame = cap.read()
+
         frame = cv.flip(frame, 1)
+        # frame = DeletFace(frame)
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         hl = cv.getTrackbarPos("H Low", "Settings")
@@ -74,8 +72,6 @@ def setMask():
     cv.destroyAllWindows()
 
     return hl, hu, sl, su, vl, vu
-
-
 def subtractBg(frame):
     fgMask = bgCap.apply(frame, learningRate=0)
     ker = np.ones((3, 3), np.uint8)
@@ -83,8 +79,6 @@ def subtractBg(frame):
     res = cv.bitwise_and(frame, frame, mask=fgMask)
 
     return res
-
-
 def findMaxContour(rThresh):
     con, _ = cv.findContours(rThresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     max_i = 0
@@ -102,8 +96,6 @@ def findMaxContour(rThresh):
         max_con = con[0]
 
     return con, max_con
-
-
 def findFingers(res, max_con):
     try:
         hull = cv.convexHull(max_con, returnPoints=False)
@@ -142,8 +134,6 @@ def findFingers(res, max_con):
         num_def = 0
 
         return defects, num_def
-
-
 def centroid(max_con):
     moment = cv.moments(max_con)
     if moment is None:
@@ -160,8 +150,6 @@ def centroid(max_con):
             cy = int(moment["m01"] / moment["m00"])
 
         return cx, cy
-
-
 def findFarPoint(res, cx, cy, defects, max_con):
     try:
         s = defects[:, 0][:, 0]
@@ -187,8 +175,6 @@ def findFarPoint(res, cx, cy, defects, max_con):
         farthest_point = 0
 
         return farthest_point
-
-
 def recognizeGestures(frame, num_def, count, farthest_point):
     try:
         if num_def == 1:
@@ -214,10 +200,12 @@ def recognizeGestures(frame, num_def, count, farthest_point):
         print("You moved the hand too fast or take it out of range of vision of the camera")
 
 
+
 cap = cv.VideoCapture('http://192.168.43.1:8080/video')
 # cap = cv.VideoCapture(0)
 
 _, firstFrame = cap.read()
+
 firstFrame = cv.flip(firstFrame, 1)
 r, h, c, w = 0, 240, 0, 640
 track_window = (c, r, w, h)
@@ -239,6 +227,8 @@ trigger = False
 while (1):
     ret, frame = cap.read()
     frame = cv.flip(frame, 1)
+
+    # frame =  DeletFace(frame)
 
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     dst = cv.calcBackProject([hsv], [0], hist, [0, 180], 1)
