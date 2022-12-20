@@ -5,7 +5,7 @@ from editBar import EditBar
 from imageViewer import ImageViewer
 from pynput.mouse import Controller
 from HandGestures.Detection import *
-from HandGestures.Conture import *
+from HandGestures.Contour import *
 
 
 class Main(tk.Tk):
