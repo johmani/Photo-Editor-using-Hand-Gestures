@@ -154,6 +154,9 @@ class EditBar(Frame):
             if self.master.is_image_selected:
                 self.master.processed_image = Functionality.Scale(self.master.processed_image,0.8,0.8)
                 self.master.image_viewer.show_image()
+
     def thickness_Slider_com(self,event):
         self.master.thickness = self.thickness_Slider.get()
+
+
 

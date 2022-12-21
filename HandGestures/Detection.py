@@ -1,8 +1,7 @@
 import cv2 as cv
 import numpy as np
 import math
-
-
+from ImageEditor.editBar import EditBar
 def nothing(x):
     pass
 
@@ -65,9 +64,10 @@ def setMask(cap):
 
         cv.imshow("Original", frame)
         cv.imshow("Filter", res)
-
+        print("S1")
         k = cv.waitKey(1)
         if k & 0xFF == ord("s"):
+            print("S")
             break
 
     cv.destroyAllWindows()
@@ -84,39 +84,3 @@ def subtractBg(frame,bgCap):
     return res
 
 
-def recognizeGestures(frame, num_def, count, farthest_point,processed_image):
-    try:
-        cv.imshow("rec ", frame)
-        if num_def == 1:
-            cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
-            if count == 0:
-                cv.imshow("rec ", frame)
-
-                count = 1
-
-        elif num_def == 2:
-            cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
-            if count == 0:
-                cv.imshow("rec ", frame)
-
-                count = 1
-
-        elif num_def == 3:
-            cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
-            if count == 0:
-                cv.imshow("rec ", frame)
-                count = 1
-
-        elif num_def == 4:
-            cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
-            if count == 0:
-                cv.imshow("rec ", frame)
-                count = 1
-
-        else:
-            cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
-            cv.imshow("rec ", frame)
-            count = 0
-
-    except:
-        print("You moved the hand too fast or take it out of range of vision of the camera")

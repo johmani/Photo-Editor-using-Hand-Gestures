@@ -1,6 +1,8 @@
 import threading
 import tkinter as tk
 from tkinter import ttk
+
+from ImageEditor.Functionality import Functionality
 from editBar import EditBar
 from imageViewer import ImageViewer
 from pynput.mouse import Controller
@@ -31,6 +33,8 @@ class Main(tk.Tk):
         separator1.pack(fill=tk.X, padx=20, pady=5)
         self.image_viewer.pack(fill=tk.BOTH, padx=20, pady=10, expand=1)
 
+
+
         self.cap = cv.VideoCapture('http://192.168.43.1:8080/video')
 
         _, firstFrame = self.cap.read()
@@ -58,7 +62,7 @@ class Main(tk.Tk):
     def MainLoop(self):
         while True:
             ret, frame = self.cap.read()
-            # frame = cv.flip(frame, 1)
+            frame = cv.flip(frame, 1)
             cv.imshow("Live", frame)
             k = cv.waitKey(1)
             cv.rectangle(frame, (380, 0), (635, 475), (0, 255, 0), 1)
@@ -102,8 +106,45 @@ class Main(tk.Tk):
                 farthest_point = findFarPoint(res, cx, cy, defects, max_con)
 
                 if self.trigger is True:
-                    recognizeGestures(roi3, num_def, self.count, farthest_point, self.processed_image)
-                    # self.image_viewer.master.image_viewer.show_image()
+                    try:
+
+                        if num_def == 1:
+                            cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
+                                        cv.LINE_AA)
+                            if count == 0:
+                                count = 1
+
+                        elif num_def == 2:
+                            cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
+                                        cv.LINE_AA)
+                            if count == 0:
+                                count = 1
+
+                        elif num_def == 3:
+                            cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
+                                        cv.LINE_AA)
+                            if count == 0:
+                                count = 1
+
+                        elif num_def == 4:
+                            cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
+                                        cv.LINE_AA)
+                            if count == 0:
+                                count = 1
+
+                        else:
+                            cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
+                                        cv.LINE_AA)
+                            self.processed_image = Functionality.Rotate(self.processed_image)
+                            self.image_viewer.master.image_viewer.show_image()
+                            count = 0
+
+                    except:
+                        print("You moved the hand too fast or take it out of range of vision of the camera")
+
+
+
+
 
                 cv.imshow("Live", frame)
                 cv.imshow("Result", res)
@@ -115,13 +156,57 @@ class Main(tk.Tk):
                 break
             elif k == ord("c"):
                 bgCap = cv.createBackgroundSubtractorMOG2(0, 50)
+                print("C")
                 self.bgCaptured = True
             elif k == ord("a"):
+                print("A")
                 self.trigger = True
 
         cv.destroyAllWindows()
         self.cap.release()
 
+
+
+
+    def recognizeGestures(self,frame, num_def, count, farthest_point, processed_image):
+        try:
+            cv.imshow("processed_image ", processed_image)
+            if num_def == 1:
+                cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+                if count == 0:
+                    self.processed_image = Functionality.Translate(self.processed_image, 10, 0)
+                    self.image_viewer.master.image_viewer.show_image()
+                    count = 1
+
+            elif num_def == 2:
+                cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+                if count == 0:
+                    self.processed_image = Functionality.Translate(self.processed_image, 10, 0)
+                    self.image_viewer.master.image_viewer.show_image()
+                    count = 1
+
+            elif num_def == 3:
+                cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+                if count == 0:
+                    self.processed_image = Functionality.Translate(self.processed_image, 10, 0)
+                    self.image_viewer.master.image_viewer.show_image()
+                    count = 1
+
+            elif num_def == 4:
+                cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+                if count == 0:
+                    self.processed_image = Functionality.Translate(self.processed_image,10,0)
+                    self.image_viewer.master.image_viewer.show_image()
+                    count = 1
+
+            else:
+                cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
+                self.processed_image = Functionality.Rotate(self.processed_image)
+                self.image_viewer.master.image_viewer.show_image()
+                count = 0
+
+        except:
+            print("You moved the hand too fast or take it out of range of vision of the camera")
 
 
 
