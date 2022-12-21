@@ -35,7 +35,7 @@ class Main(tk.Tk):
 
 
 
-        self.cap = cv.VideoCapture('http://192.168.43.1:8080/video')
+        self.cap = cv.VideoCapture(0)
 
         _, firstFrame = self.cap.read()
         cv.rectangle(firstFrame, (380, 0), (635, 475), (0, 255, 0), 1)
@@ -106,41 +106,8 @@ class Main(tk.Tk):
                 farthest_point = findFarPoint(res, cx, cy, defects, max_con)
 
                 if self.trigger is True:
-                    try:
+                    self.recognizeGestures(res,num_def,self.count,farthest_point)
 
-                        if num_def == 1:
-                            cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
-                                        cv.LINE_AA)
-                            if count == 0:
-                                count = 1
-
-                        elif num_def == 2:
-                            cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
-                                        cv.LINE_AA)
-                            if count == 0:
-                                count = 1
-
-                        elif num_def == 3:
-                            cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
-                                        cv.LINE_AA)
-                            if count == 0:
-                                count = 1
-
-                        elif num_def == 4:
-                            cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
-                                        cv.LINE_AA)
-                            if count == 0:
-                                count = 1
-
-                        else:
-                            cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3,
-                                        cv.LINE_AA)
-                            self.processed_image = Functionality.Rotate(self.processed_image)
-                            self.image_viewer.master.image_viewer.show_image()
-                            count = 0
-
-                    except:
-                        print("You moved the hand too fast or take it out of range of vision of the camera")
 
 
 
@@ -148,8 +115,8 @@ class Main(tk.Tk):
 
                 cv.imshow("Live", frame)
                 cv.imshow("Result", res)
-                cv.imshow("Threshold", rThresh)
-                cv.imshow("Mask", mask)
+                # cv.imshow("Threshold", rThresh)
+                # cv.imshow("Mask", mask)
 
             k = cv.waitKey(1)
             if k & 0xFF == 27:
@@ -168,43 +135,39 @@ class Main(tk.Tk):
 
 
 
-    def recognizeGestures(self,frame, num_def, count, farthest_point, processed_image):
+    def recognizeGestures(self,frame, num_def, count, farthest_point):
         try:
-            cv.imshow("processed_image ", processed_image)
             if num_def == 1:
                 cv.putText(frame, "2", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
                 if count == 0:
                     self.processed_image = Functionality.Translate(self.processed_image, 10, 0)
-                    self.image_viewer.master.image_viewer.show_image()
                     count = 1
 
             elif num_def == 2:
                 cv.putText(frame, "3", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
                 if count == 0:
-                    self.processed_image = Functionality.Translate(self.processed_image, 10, 0)
-                    self.image_viewer.master.image_viewer.show_image()
+                    self.processed_image = Functionality.Rotate(self.processed_image)
                     count = 1
 
             elif num_def == 3:
                 cv.putText(frame, "4", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
                 if count == 0:
-                    self.processed_image = Functionality.Translate(self.processed_image, 10, 0)
-                    self.image_viewer.master.image_viewer.show_image()
+                    self.processed_image = Functionality.Scale(self.processed_image, 0.8, 0.8)
+
                     count = 1
 
             elif num_def == 4:
                 cv.putText(frame, "5", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
                 if count == 0:
-                    self.processed_image = Functionality.Translate(self.processed_image,10,0)
-                    self.image_viewer.master.image_viewer.show_image()
+                    # TODO
                     count = 1
 
             else:
                 cv.putText(frame, "1", (0, 50), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv.LINE_AA)
-                self.processed_image = Functionality.Rotate(self.processed_image)
-                self.image_viewer.master.image_viewer.show_image()
+                # TODO
                 count = 0
 
+            self.image_viewer.master.image_viewer.show_image()
         except:
             print("You moved the hand too fast or take it out of range of vision of the camera")
 
